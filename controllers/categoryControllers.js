@@ -2,7 +2,6 @@ const categoryModel = require("../Models/categoryModel");
 const asyncHandler = require("express-async-handler");
 
 const addCategory = asyncHandler(async (req, res) => {
-  console.log("req.user from add category", req.user);
   const { title } = req.body;
   if (!title) {
     res.status(400);
@@ -29,7 +28,7 @@ const getCategoryById = asyncHandler(async (req, res) => {
   const category = await categoryModel
     .findOne({ _id: categoryId })
     .populate("todos");
-  console.log("Retrieved category:", category);
+
   if (category.userId.toString() == req.user._id.toString()) {
     res.status(200).json(category);
   } else {
@@ -53,7 +52,7 @@ const updateCategory = asyncHandler(async (req, res) => {
 const deleteCategory = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
   const category = await categoryModel.findOne({ _id: categoryId }).exec();
-  console.log("Category", category);
+
   if (category.userId.toString() == req.user._id.toString()) {
     await categoryModel.findByIdAndDelete(categoryId);
     res.status(200).json(category);

@@ -15,22 +15,11 @@ const path = require("path");
 app.use(cors(corsOptions));
 app.use(credentials);
 app.options("*", cors(corsOptions));
-// app.use((req, res, next) => {
-//   console.log("Request headers", req.headers);
-//   next();
-// });
 dbConnect();
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/api/user", userRoute);
-// app.use((req, res, next) => {
-//   if (!req.headers.cookie) {
-//     return res.status(403).send("Forbidden: No Cookie Header");
-//   } else if (req.headers.cookie) {
-//     next();
-//   }
-// });
 app.use(express.static("./Images"));
 app.use("/api/todo", todoRoute);
 app.use("/api/favorite", favoriteRoute);

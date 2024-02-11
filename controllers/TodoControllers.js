@@ -6,7 +6,6 @@ const fs = require("fs");
 const path = require("path");
 
 const addTodo = asyncHandler(async (req, res) => {
-  console.log("req.user from add todo", req.user);
   const { title, body, status, categoryId } = req.body;
   const img = req.file;
 
@@ -16,7 +15,7 @@ const addTodo = asyncHandler(async (req, res) => {
   }
   try {
     const todoData = {};
-    console.log(img);
+
     if (img) {
       todoData.img = img.filename;
     }
@@ -32,7 +31,6 @@ const addTodo = asyncHandler(async (req, res) => {
         throw new Error("category not found");
       }
     }
-    console.log("*".repeat(15), todoData, "*".repeat(15));
     const todo = await todoModel.create({
       title: title,
       body: body,
@@ -76,8 +74,6 @@ const updateTodo = asyncHandler(async (req, res, next) => {
   const { todoId } = req.params;
   const { title, body, status, categoryId } = req.body;
   const img = req.file;
-  console.log({ body: req.body });
-  console.log({ file: req.file });
 
   try {
     const todo = await todoModel.findById(todoId).exec();
@@ -101,10 +97,7 @@ const updateTodo = asyncHandler(async (req, res, next) => {
     todo.status = status || todo.status;
 
     if (categoryId) {
-      console.log({ categoryId });
-      console.log({ [todo.categoryId.toString()]: todo.categoryId.toString() });
       if (categoryId === todo.categoryId.toString()) {
-        // Category ID is the same, no need to change anything.
         todo.categoryId = categoryId;
       } else {
         const newCategory = await categoryModel.findById(categoryId).exec();
@@ -119,7 +112,6 @@ const updateTodo = asyncHandler(async (req, res, next) => {
           const oldCategory = await categoryModel
             .findById(todo.categoryId)
             .exec();
-          console.log({ oldCategory });
 
           if (oldCategory) {
             const todoIndex = oldCategory.todos.indexOf(todo._id);
@@ -138,7 +130,6 @@ const updateTodo = asyncHandler(async (req, res, next) => {
       }
     }
     if (img) {
-      console.log(img);
       if (
         todo.img &&
         fs.existsSync(path.join(__dirname, "../Images", todo.img))
@@ -178,7 +169,6 @@ const deleteTodo = asyncHandler(async (req, res) => {
       if (todo.img) {
         if (fs.existsSync(path.join(__dirname, "../Images", todo.img))) {
           fs.unlinkSync(path.join(__dirname, "../Images", todo.img));
-          console.log("image deleted");
         }
       }
       res.status(200).json({

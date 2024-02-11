@@ -3,8 +3,7 @@ const favoriteModel = require("../Models/favoritesModel");
 
 const addFavorites = asyncHandler(async (req, res) => {
   const { todoId } = req.body;
-  console.log("req.body", req.body);
-  console.log("todoId", todoId);
+
   try {
     let userFavorites = await favoriteModel
       .findOne({ userId: req.user._id })
@@ -40,7 +39,6 @@ const deleteFavorite = asyncHandler(async (req, res) => {
     throw new Error("todo not found");
   }
   if (Fav.userId.toString() == req.user._id.toString()) {
-    console.log(Fav);
     let deletedFavIndex = Fav.todoes.findIndex((item) => item == todoId);
     Fav.todoes.splice(deletedFavIndex, 1);
     await Fav.save();

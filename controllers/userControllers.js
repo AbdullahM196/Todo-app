@@ -42,7 +42,7 @@ const register = asyncHandler(async (req, res) => {
 });
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  console.log({ email, password });
+
   if (!email || !password) {
     return res.status(400).json({ message: "Please add all fields" });
   }
@@ -54,7 +54,6 @@ const login = asyncHandler(async (req, res) => {
   if (!findUser) {
     return res.status(404).json({ message: "Invalid credentials" });
   }
-  console.log({ findUser });
   const match = await bcrypt.compare(password, findUser.password);
   if (!match) {
     return res.status(404).json({ message: "Invalid credentials" });
@@ -94,14 +93,11 @@ const logout = asyncHandler(async (req, res) => {
   // Delete Token in db
   foundUser.Token = "";
   const result = await foundUser.save();
-  console.log(result);
   req.user = "";
   res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
   res.sendStatus(204);
-  console.log("req.user :", req.user);
 });
 const profile = asyncHandler(async (req, res) => {
-  console.log("req.user :", req.user);
   if (req.user) {
     const user = req.user;
     return res.status(200).json({
@@ -114,10 +110,8 @@ const profile = asyncHandler(async (req, res) => {
   }
 });
 const editProfile = asyncHandler(async (req, res) => {
-  console.log("req.user :", req.user);
   const { userName, email, password } = req.body;
   const img = req.file;
-  console.log({ img });
   if (req.user) {
     const user = req.user;
     user.userName = userName || user.userName;
