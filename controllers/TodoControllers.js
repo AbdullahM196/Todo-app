@@ -1,14 +1,11 @@
-const express = require("express");
 const todoModel = require("../Models/todosModel");
 const asyncHandler = require("express-async-handler");
 const categoryModel = require("../Models/categoryModel");
-const fs = require("fs");
-const path = require("path");
-
+const saveImage = require("../config/saveToCloudinary");
+const cloudinary = require("cloudinary").v2;
 const addTodo = asyncHandler(async (req, res) => {
   const { title, body, status, categoryId } = req.body;
   const img = req.file;
-
   if (!title && !body) {
     res.status(400);
     throw new Error("todo dose not saved");
@@ -17,7 +14,12 @@ const addTodo = asyncHandler(async (req, res) => {
     const todoData = {};
 
     if (img) {
-      todoData.img = img.filename;
+      try {
+        todoData.img = await saveImage(img);
+      } catch (error) {
+        res.status(500).json({ message: "Internal server error" });
+        return;
+      }
     }
     if (categoryId) {
       const category = await categoryModel.findOne({
@@ -36,7 +38,8 @@ const addTodo = asyncHandler(async (req, res) => {
       body: body,
       status: status,
       userId: req.user._id,
-      ...todoData,
+      categoryId: todoData.categoryId || "",
+      img: todoData.img || "",
     });
     res.status(201).json({
       todo,
@@ -122,23 +125,21 @@ const updateTodo = asyncHandler(async (req, res, next) => {
             }
           }
         }
-
-        // Add to new category.
         newCategory.todos.push(todoId);
         await newCategory.save();
         todo.categoryId = categoryId;
       }
     }
     if (img) {
-      if (
-        todo.img &&
-        fs.existsSync(path.join(__dirname, "../Images", todo.img))
-      ) {
-        fs.unlinkSync(path.join(__dirname, "../Images", todo.img));
+      try {
+        if (todo.img?.public_id) {
+          await cloudinary.uploader.destroy(todo.img.public_id);
+        }
+        todo.img = await saveImage(img);
+      } catch (error) {
+        res.status(500).json({ message: "Internal server error" });
+        return;
       }
-      todo.img = img.filename;
-    } else {
-      todo.img = todo.img;
     }
 
     const updatedTodo = await todo.save();
@@ -157,6 +158,9 @@ const deleteTodo = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("todo not found");
   }
+  if (todo.img.public_id) {
+    await cloudinary.uploader.destroy(todo.img.public_id);
+  }
   if (todo.userId.toString() == req.user._id.toString()) {
     try {
       const deletedTodo = await todoModel.findByIdAndDelete(todoId);
@@ -165,11 +169,6 @@ const deleteTodo = asyncHandler(async (req, res) => {
         let todoIndex = category.todos.findIndex((id) => todo._id == id);
         category.todos.splice(todoIndex, 1);
         await category.save();
-      }
-      if (todo.img) {
-        if (fs.existsSync(path.join(__dirname, "../Images", todo.img))) {
-          fs.unlinkSync(path.join(__dirname, "../Images", todo.img));
-        }
       }
       res.status(200).json({
         deletedTodo,

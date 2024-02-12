@@ -2,10 +2,10 @@ const userModel = require("../Models/userModel");
 const bcrypt = require("bcryptjs");
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
-const fs = require("fs");
-const path = require("path");
+const saveImage = require("../config/saveToCloudinary");
+const cloudinary = require("cloudinary").v2;
 const register = asyncHandler(async (req, res) => {
-  const { userName, email, password, img } = req.body;
+  const { userName, email, password } = req.body;
   if (!userName || !email || !password) {
     return res.status(400).json({ message: "Please add all fields" });
   }
@@ -92,7 +92,7 @@ const logout = asyncHandler(async (req, res) => {
 
   // Delete Token in db
   foundUser.Token = "";
-  const result = await foundUser.save();
+  await foundUser.save();
   req.user = "";
   res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
   res.sendStatus(204);
@@ -122,15 +122,16 @@ const editProfile = asyncHandler(async (req, res) => {
       user.password = hashedPassword;
     }
     if (img) {
-      if (
-        user.img &&
-        fs.existsSync(path.join(__dirname, "../Images", user.img))
-      ) {
-        fs.unlinkSync(path.join(__dirname, "../Images", user.img));
+      try {
+        if (user.img?.public_id) {
+          await cloudinary.uploader.destroy(user.img.public_id);
+        }
+        user.img = await saveImage(img);
+      } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" });
+        return;
       }
-      user.img = img.filename;
-    } else {
-      user.img = "";
     }
     const updatedUser = await user.save();
     res.status(200).json({

@@ -8,7 +8,7 @@ const {
 const express = require("express");
 const router = express.Router();
 const protect = require("../middleware/authMiddleWare");
-const upload = require("../middleware/uploadImage");
+const { upload } = require("../middleware/uploadImages");
 
 router.post("/add", protect, upload.single("img"), addTodo);
 router.get("/getAll", protect, getTodoes);

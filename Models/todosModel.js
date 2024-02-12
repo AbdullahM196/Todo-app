@@ -4,7 +4,13 @@ const todoSchema = new Schema(
   {
     title: String,
     body: String,
-    img: String,
+    img: {
+      type: { url: String, public_id: String, _id: false },
+      default: {
+        url: "",
+        public_id: "",
+      },
+    },
     status: {
       type: String,
       default: "to-do",

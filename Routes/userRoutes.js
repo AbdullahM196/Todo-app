@@ -8,7 +8,7 @@ const {
   editProfile,
 } = require("../controllers/userControllers");
 const protect = require("../middleware/authMiddleWare");
-const upload = require("../middleware/uploadImage");
+const { upload } = require("../middleware/uploadImages");
 
 router.post("/register", register);
 router.post("/login", login);

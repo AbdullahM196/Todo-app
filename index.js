@@ -11,7 +11,6 @@ const dbConnect = require("./config/connectTodb");
 const { NotFound, errorHandler } = require("./middleware/errorHandling");
 const { corsOptions } = require("./config/corsOptions");
 const credentials = require("./middleware/credentials");
-const path = require("path");
 app.use(cors(corsOptions));
 app.use(credentials);
 app.options("*", cors(corsOptions));

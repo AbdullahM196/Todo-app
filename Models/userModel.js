@@ -25,8 +25,11 @@ const userSchema = new Schema({
     default: "",
   },
   img: {
-    type: String,
-    default: "",
+    type: { url: String, public_id: String, _id: false },
+    default: {
+      url: "",
+      public_id: "",
+    },
   },
 });
 const userModel = mongoose.model("User", userSchema);
