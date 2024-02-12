@@ -1,4 +1,7 @@
-const allowedOrigins = ["http://localhost:5000"];
+const allowedOrigins = [
+  "http://localhost:5000",
+  "https://todo-app-3edb6.web.app/",
+];
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin) {
