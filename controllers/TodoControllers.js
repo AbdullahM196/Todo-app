@@ -83,11 +83,17 @@ const updateTodo = asyncHandler(async (req, res, next) => {
       res.status(404);
       return next(new Error("Todo not found"));
     }
+    console.log("====================================");
+    console.log({ todo });
+    console.log("====================================");
     // check owner of the task
     if (todo.userId.toString() !== req.user._id.toString()) {
       res.status(403);
       return next(new Error("Unauthorized access to todo"));
     }
+    console.log("====================================");
+    console.log(`he is the owner of todo`);
+    console.log("====================================");
 
     todo.title = title || todo.title;
     todo.body = body || todo.body;
@@ -130,6 +136,9 @@ const updateTodo = asyncHandler(async (req, res, next) => {
       }
       try {
         todo.img = await saveImage(img);
+        console.log("====================================");
+        console.log(await saveImage(img));
+        console.log("====================================");
       } catch (error) {
         res.status(500).json({ message: "Internal server error" });
         return;
