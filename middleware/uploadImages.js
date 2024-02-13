@@ -9,7 +9,7 @@ cloudinary.config({
 });
 const uploadImage = async (file) => {
   return new Promise((resolve, reject) => {
-    const img = file.buffer.toString("base64");
+    const img = file?.buffer?.toString("base64");
     cloudinary.uploader.upload(
       `data:image/png;base64,${img}`,
       (error, result) => {

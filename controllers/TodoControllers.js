@@ -77,22 +77,13 @@ const updateTodo = asyncHandler(async (req, res, next) => {
   const { todoId } = req.params;
   const { title, body, status, categoryId } = req.body;
   const img = req.file;
-  console.log("====================================");
-  console.log(img);
-  console.log("====================================");
-
   try {
     const todo = await todoModel.findById(todoId).exec();
-    // check owner of the task
-    if (todo.userId.toString() !== req.user._id.toString()) {
-      res.status(403);
-      return next(new Error("Unauthorized access to todo"));
-    }
     if (!todo) {
       res.status(404);
       return next(new Error("Todo not found"));
     }
-
+    // check owner of the task
     if (todo.userId.toString() !== req.user._id.toString()) {
       res.status(403);
       return next(new Error("Unauthorized access to todo"));
@@ -134,17 +125,11 @@ const updateTodo = asyncHandler(async (req, res, next) => {
       }
     }
     if (img) {
-      console.log("====================================");
-      console.log({ imgfromCheck: img });
-      console.log("====================================");
       if (todo?.img?.public_id) {
         await cloudinary.uploader.destroy(todo.img.public_id);
       }
       try {
         todo.img = await saveImage(img);
-        console.log("====================================");
-        console.log(await saveImage(img));
-        console.log("====================================");
       } catch (error) {
         res.status(500).json({ message: "Internal server error" });
         return;
