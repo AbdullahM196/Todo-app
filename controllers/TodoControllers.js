@@ -135,7 +135,7 @@ const updateTodo = asyncHandler(async (req, res, next) => {
     }
     if (img) {
       console.log("====================================");
-      console.log({ img });
+      console.log({ imgfromCheck: img });
       console.log("====================================");
       if (todo.img?.public_id) {
         await cloudinary.uploader.destroy(todo.img.public_id);
