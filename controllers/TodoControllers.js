@@ -38,8 +38,8 @@ const addTodo = asyncHandler(async (req, res) => {
       body: body,
       status: status,
       userId: req.user._id,
-      categoryId: todoData.categoryId || "",
-      img: todoData.img || "",
+      categoryId: todoData.categoryId || null,
+      img: todoData.img || null,
     });
     res.status(201).json({
       todo,
