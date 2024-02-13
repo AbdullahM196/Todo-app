@@ -142,6 +142,9 @@ const updateTodo = asyncHandler(async (req, res, next) => {
       }
       try {
         todo.img = await saveImage(img);
+        console.log("====================================");
+        console.log(todo.img);
+        console.log("====================================");
       } catch (error) {
         res.status(500).json({ message: "Internal server error" });
         return;
