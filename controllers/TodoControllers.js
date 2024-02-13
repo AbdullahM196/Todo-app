@@ -134,10 +134,13 @@ const updateTodo = asyncHandler(async (req, res, next) => {
       }
     }
     if (img) {
+      console.log("====================================");
+      console.log({ img });
+      console.log("====================================");
+      if (todo.img?.public_id) {
+        await cloudinary.uploader.destroy(todo.img.public_id);
+      }
       try {
-        if (todo.img?.public_id) {
-          await cloudinary.uploader.destroy(todo.img.public_id);
-        }
         todo.img = await saveImage(img);
       } catch (error) {
         res.status(500).json({ message: "Internal server error" });
