@@ -77,6 +77,9 @@ const updateTodo = asyncHandler(async (req, res, next) => {
   const { todoId } = req.params;
   const { title, body, status, categoryId } = req.body;
   const img = req.file;
+  console.log("====================================");
+  console.log(img);
+  console.log("====================================");
 
   try {
     const todo = await todoModel.findById(todoId).exec();
